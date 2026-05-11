@@ -3,9 +3,12 @@ const slides = [...document.querySelectorAll('.slide')];
 const dots = document.querySelector('#dots');
 const next = document.querySelector('#next');
 const prev = document.querySelector('#prev');
+const pauseCarousel = document.querySelector('#pauseCarousel');
 const jumpButtons = [...document.querySelectorAll('[data-jump]')];
 let current = 0;
 let timer;
+let isPaused = false;
+const AUTOPLAY_DELAY = 9000;
 
 function getNextSlideIndex(index, total) {
   return total <= 0 ? 0 : (index + 1) % total;
@@ -33,10 +36,25 @@ function update() {
 
 function restartAutoplay() {
   clearInterval(timer);
+
+  if (isPaused) return;
+
   timer = setInterval(() => {
     current = getNextSlideIndex(current, slides.length);
     update();
-  }, 6500);
+  }, AUTOPLAY_DELAY);
+}
+
+function setPaused(value) {
+  isPaused = value;
+
+  if (!pauseCarousel) return;
+
+  pauseCarousel.setAttribute('aria-pressed', String(isPaused));
+  pauseCarousel.setAttribute('aria-label', isPaused ? 'Reanudar carrusel' : 'Pausar carrusel');
+  pauseCarousel.textContent = isPaused ? '▶' : 'Ⅱ';
+
+  restartAutoplay();
 }
 
 function goTo(index) {
@@ -57,6 +75,16 @@ prev.addEventListener('click', () => {
   restartAutoplay();
 });
 
+if (pauseCarousel) {
+  pauseCarousel.addEventListener('click', () => setPaused(!isPaused));
+}
+
+if (carousel) {
+  carousel.addEventListener('mouseenter', () => setPaused(true));
+  carousel.addEventListener('mouseleave', () => setPaused(false));
+  carousel.addEventListener('touchstart', () => setPaused(true), { passive: true });
+}
+
 jumpButtons.forEach((button) => {
   button.addEventListener('click', () => goTo(Number(button.dataset.jump)));
 });
@@ -67,10 +95,10 @@ document.addEventListener('keydown', (event) => {
 });
 
 function runTests() {
-  console.assert(getNextSlideIndex(0, 7) === 1, 'next from 0 to 1');
-  console.assert(getNextSlideIndex(6, 7) === 0, 'next loops last to first');
-  console.assert(getPreviousSlideIndex(0, 7) === 6, 'previous loops first to last');
-  console.assert(getPreviousSlideIndex(3, 7) === 2, 'previous moves back');
+  console.assert(getNextSlideIndex(0, 6) === 1, 'next from 0 to 1');
+  console.assert(getNextSlideIndex(5, 6) === 0, 'next loops last to first');
+  console.assert(getPreviousSlideIndex(0, 6) === 5, 'previous loops first to last');
+  console.assert(getPreviousSlideIndex(3, 6) === 2, 'previous moves back');
 }
 const subjectsButton = document.querySelector('#subjectsButton');
 const skillsPanel = document.querySelector('#skillsPanel');
@@ -101,14 +129,14 @@ const certPrev = document.querySelector('#certPrev');
 if (certificatesTrack && certNext && certPrev) {
   certNext.addEventListener('click', () => {
     certificatesTrack.scrollBy({
-      left: certificatesTrack.clientWidth * 0.95,
+      left: certificatesTrack.clientWidth * 0.85,
       behavior: 'smooth',
     });
   });
 
   certPrev.addEventListener('click', () => {
     certificatesTrack.scrollBy({
-      left: -certificatesTrack.clientWidth * 0.95,
+      left: -certificatesTrack.clientWidth * 0.85,
       behavior: 'smooth',
     });
   });

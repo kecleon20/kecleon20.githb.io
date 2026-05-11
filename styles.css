@@ -1320,3 +1320,136 @@ a {
     padding: 14px;
   }
 }
+
+
+/* =========================
+   AJUSTES SOLICITADOS
+   - Carrusel más lento y pausado desde JS
+   - Mejor contraste en panel info
+   - Carrusel fijo en mobile
+   - Flechas laterales visibles en mobile
+========================= */
+
+.download-word {
+  background: linear-gradient(135deg, var(--cyan), #ffffff) !important;
+  color: #03101a !important;
+}
+
+#pauseCarousel {
+  font-size: 21px;
+  font-weight: 900;
+}
+
+#pauseCarousel[aria-pressed="true"] {
+  background: var(--cyan);
+  color: var(--bg-dark);
+}
+
+/* Panel Info / Sobre mí: texto más oscuro y legible sobre la foto/fondo */
+.split-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(2, 7, 13, 0.64),
+    rgba(2, 7, 13, 0.36)
+  );
+  pointer-events: none;
+}
+
+.split-card .copy,
+.split-card .info-grid {
+  position: relative;
+  z-index: 2;
+}
+
+.split-card p,
+.split-card .info-grid span {
+  color: #d7e4ec;
+}
+
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .stage {
+    height: 100svh;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .carousel {
+    height: 100%;
+    will-change: transform;
+    touch-action: pan-y;
+  }
+
+  .slide {
+    height: 100svh;
+    min-height: 100svh;
+    overflow-y: auto;
+    padding: 108px 52px 88px;
+    align-items: center;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .controls {
+    position: absolute;
+    top: 50%;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    padding: 0 10px;
+    transform: translateY(-50%);
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .controls button {
+    pointer-events: auto;
+    width: 46px;
+    height: 46px;
+    font-size: 30px;
+    background: rgba(2, 7, 13, 0.58);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.28);
+  }
+
+  #pauseCarousel {
+    position: absolute;
+    left: 50%;
+    bottom: -58px;
+    transform: translateX(-50%);
+    font-size: 18px;
+  }
+
+  .dots {
+    bottom: 24px;
+  }
+}
+
+@media (max-width: 520px) {
+  .slide {
+    padding: 98px 48px 86px;
+  }
+
+  .controls {
+    padding: 0 6px;
+  }
+
+  .controls button {
+    width: 42px;
+    height: 42px;
+    font-size: 28px;
+  }
+
+  .art-card {
+    max-height: calc(100svh - 150px);
+    overflow-y: auto;
+  }
+}
