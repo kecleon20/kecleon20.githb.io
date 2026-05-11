@@ -101,14 +101,14 @@ const certPrev = document.querySelector('#certPrev');
 if (certificatesTrack && certNext && certPrev) {
   certNext.addEventListener('click', () => {
     certificatesTrack.scrollBy({
-      left: certificatesTrack.clientWidth * 0.85,
+      left: certificatesTrack.clientWidth * 0.95,
       behavior: 'smooth',
     });
   });
 
   certPrev.addEventListener('click', () => {
     certificatesTrack.scrollBy({
-      left: -certificatesTrack.clientWidth * 0.85,
+      left: -certificatesTrack.clientWidth * 0.95,
       behavior: 'smooth',
     });
   });
