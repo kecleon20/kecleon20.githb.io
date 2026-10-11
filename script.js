@@ -1,3 +1,6 @@
+/* =========================================================================
+   1. CARRUSEL PRINCIPAL
+   ========================================================================= */
 const carousel = document.querySelector('#carousel');
 const slides = [...document.querySelectorAll('.slide')];
 const dots = document.querySelector('#dots');
@@ -5,6 +8,7 @@ const next = document.querySelector('#next');
 const prev = document.querySelector('#prev');
 const pauseCarousel = document.querySelector('#pauseCarousel');
 const jumpButtons = [...document.querySelectorAll('[data-jump]')];
+
 let current = 0;
 let timer;
 let isPaused = false;
@@ -19,6 +23,7 @@ function getPreviousSlideIndex(index, total) {
 }
 
 function renderDots() {
+  if (!dots) return;
   dots.innerHTML = '';
   slides.forEach((_, index) => {
     const dot = document.createElement('button');
@@ -29,16 +34,19 @@ function renderDots() {
 }
 
 function update() {
-  carousel.style.transform = `translateX(-${current * 100}vw)`;
-  slides.forEach((slide, index) => slide.classList.toggle('active', index === current));
-  [...dots.children].forEach((dot, index) => dot.classList.toggle('active', index === current));
+  if (!carousel) return;
+  carousel.style.transform = `translate3d(-${current * 100}%, 0, 0)`;
+  slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+  if (dots) {
+    [...dots.children].forEach((dot, i) =>
+      dot.classList.toggle('active', i === current)
+    );
+  }
 }
 
 function restartAutoplay() {
   clearInterval(timer);
-
   if (isPaused) return;
-
   timer = setInterval(() => {
     current = getNextSlideIndex(current, slides.length);
     update();
@@ -47,13 +55,13 @@ function restartAutoplay() {
 
 function setPaused(value) {
   isPaused = value;
-
   if (!pauseCarousel) return;
-
   pauseCarousel.setAttribute('aria-pressed', String(isPaused));
-  pauseCarousel.setAttribute('aria-label', isPaused ? 'Reanudar carrusel' : 'Pausar carrusel');
+  pauseCarousel.setAttribute(
+    'aria-label',
+    isPaused ? 'Reanudar carrusel' : 'Pausar carrusel'
+  );
   pauseCarousel.textContent = isPaused ? '▶' : 'Ⅱ';
-
   restartAutoplay();
 }
 
@@ -63,17 +71,21 @@ function goTo(index) {
   restartAutoplay();
 }
 
-next.addEventListener('click', () => {
-  current = getNextSlideIndex(current, slides.length);
-  update();
-  restartAutoplay();
-});
+if (next) {
+  next.addEventListener('click', () => {
+    current = getNextSlideIndex(current, slides.length);
+    update();
+    restartAutoplay();
+  });
+}
 
-prev.addEventListener('click', () => {
-  current = getPreviousSlideIndex(current, slides.length);
-  update();
-  restartAutoplay();
-});
+if (prev) {
+  prev.addEventListener('click', () => {
+    current = getPreviousSlideIndex(current, slides.length);
+    update();
+    restartAutoplay();
+  });
+}
 
 if (pauseCarousel) {
   pauseCarousel.addEventListener('click', () => setPaused(!isPaused));
@@ -82,7 +94,6 @@ if (pauseCarousel) {
 if (carousel) {
   carousel.addEventListener('mouseenter', () => setPaused(true));
   carousel.addEventListener('mouseleave', () => setPaused(false));
-  carousel.addEventListener('touchstart', () => setPaused(true), { passive: true });
 }
 
 jumpButtons.forEach((button) => {
@@ -90,16 +101,72 @@ jumpButtons.forEach((button) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'ArrowRight') next.click();
-  if (event.key === 'ArrowLeft') prev.click();
+  if (event.key === 'ArrowRight' && next) next.click();
+  if (event.key === 'ArrowLeft' && prev) prev.click();
 });
 
-function runTests() {
-  console.assert(getNextSlideIndex(0, 6) === 1, 'next from 0 to 1');
-  console.assert(getNextSlideIndex(5, 6) === 0, 'next loops last to first');
-  console.assert(getPreviousSlideIndex(0, 6) === 5, 'previous loops first to last');
-  console.assert(getPreviousSlideIndex(3, 6) === 2, 'previous moves back');
-}
+/* =========================================================================
+   2. SWIPE TÁCTIL PARA EL CARRUSEL
+   ========================================================================= */
+let touchStartX = 0;
+let touchStartY = 0;
+let touchDeltaX = 0;
+let touchDeltaY = 0;
+let isSwiping = false;
+
+document.addEventListener(
+  'touchstart',
+  (e) => {
+    if (e.target.closest('.certificates-track, .pdf-modal, .image-lightbox'))
+      return;
+    const t = e.changedTouches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    touchDeltaX = 0;
+    touchDeltaY = 0;
+    isSwiping = false;
+    setPaused(true);
+  },
+  { passive: true }
+);
+
+document.addEventListener(
+  'touchmove',
+  (e) => {
+    const t = e.changedTouches[0];
+    touchDeltaX = t.clientX - touchStartX;
+    touchDeltaY = t.clientY - touchStartY;
+    if (
+      !isSwiping &&
+      Math.abs(touchDeltaX) > Math.abs(touchDeltaY) &&
+      Math.abs(touchDeltaX) > 12
+    ) {
+      isSwiping = true;
+    }
+  },
+  { passive: true }
+);
+
+document.addEventListener(
+  'touchend',
+  () => {
+    if (isSwiping && Math.abs(touchDeltaX) > 55) {
+      if (touchDeltaX < 0) {
+        current = getNextSlideIndex(current, slides.length);
+      } else {
+        current = getPreviousSlideIndex(current, slides.length);
+      }
+      update();
+    }
+    isSwiping = false;
+    setPaused(false);
+  },
+  { passive: true }
+);
+
+/* =========================================================================
+   3. BOTÓN MATERIAS PROMOCIONADAS
+   ========================================================================= */
 const subjectsButton = document.querySelector('#subjectsButton');
 const skillsPanel = document.querySelector('#skillsPanel');
 const subjectsPanel = document.querySelector('#subjectsPanel');
@@ -118,10 +185,25 @@ if (subjectsButton && skillsPanel && subjectsPanel) {
     restartAutoplay();
   });
 }
+
+/* =========================================================================
+   4. INICIALIZAR CARRUSEL + TESTS
+   ========================================================================= */
 renderDots();
 update();
 restartAutoplay();
+
+function runTests() {
+  console.assert(getNextSlideIndex(0, 6) === 1, 'next from 0 to 1');
+  console.assert(getNextSlideIndex(5, 6) === 0, 'next loops last to first');
+  console.assert(getPreviousSlideIndex(0, 6) === 5, 'previous loops first to last');
+  console.assert(getPreviousSlideIndex(3, 6) === 2, 'previous moves back');
+}
 runTests();
+
+/* =========================================================================
+   5. CERTIFICADOS — FLECHAS IZQ/DER
+   ========================================================================= */
 const certificatesTrack = document.querySelector('#certificatesTrack');
 const certNext = document.querySelector('#certNext');
 const certPrev = document.querySelector('#certPrev');
@@ -142,12 +224,14 @@ if (certificatesTrack && certNext && certPrev) {
   });
 }
 
-
-/* =========================
-   CERTIFICADOS: FALLBACKS + LIGHTBOX CON ZOOM
-========================= */
+/* =========================================================================
+   6. FALLBACKS DE IMÁGENES DE CERTIFICADOS
+   ========================================================================= */
 document.querySelectorAll('img[data-fallbacks]').forEach((img) => {
-  const fallbacks = img.dataset.fallbacks.split(',').map((item) => item.trim()).filter(Boolean);
+  const fallbacks = img.dataset.fallbacks
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
 
   img.addEventListener('error', () => {
     if (!fallbacks.length) return;
@@ -156,6 +240,9 @@ document.querySelectorAll('img[data-fallbacks]').forEach((img) => {
   });
 });
 
+/* =========================================================================
+   7. LIGHTBOX DE CERTIFICADOS CON ZOOM
+   ========================================================================= */
 const lightbox = document.querySelector('#imageLightbox');
 const lightboxImage = document.querySelector('#lightboxImage');
 const lightboxCanvas = document.querySelector('#lightboxCanvas');
@@ -164,6 +251,7 @@ const zoomIn = document.querySelector('#zoomIn');
 const zoomOut = document.querySelector('#zoomOut');
 const zoomReset = document.querySelector('#zoomReset');
 const openFullImage = document.querySelector('#openFullImage');
+
 let currentZoom = 1;
 
 function setLightboxZoom(value) {
@@ -192,7 +280,9 @@ function closeCertificate() {
 }
 
 document.querySelectorAll('.certificate-open img').forEach((img) => {
-  img.addEventListener('click', () => openCertificate(img.currentSrc || img.src, img.alt));
+  img.addEventListener('click', () =>
+    openCertificate(img.currentSrc || img.src, img.alt)
+  );
 });
 
 if (closeLightbox) closeLightbox.addEventListener('click', closeCertificate);
@@ -207,13 +297,107 @@ if (lightbox) {
 }
 
 if (lightboxCanvas) {
-  lightboxCanvas.addEventListener('wheel', (event) => {
-    if (!lightbox || !lightbox.classList.contains('active')) return;
-    event.preventDefault();
-    setLightboxZoom(currentZoom + (event.deltaY < 0 ? 0.12 : -0.12));
-  }, { passive: false });
+  lightboxCanvas.addEventListener(
+    'wheel',
+    (event) => {
+      if (!lightbox || !lightbox.classList.contains('active')) return;
+      event.preventDefault();
+      setLightboxZoom(currentZoom + (event.deltaY < 0 ? 0.12 : -0.12));
+    },
+    { passive: false }
+  );
 }
 
+/* =========================================================================
+   8. MODAL PDF (Ver CV / Descargar CV)
+   ========================================================================= */
+const pdfModal = document.querySelector('#pdfModal');
+const pdfFrame = document.querySelector('#pdfFrame');
+const pdfClose = document.querySelector('#pdfClose');
+const pdfOpenTab = document.querySelector('#pdfOpenTab');
+const pdfDownload = document.querySelector('#pdfDownload');
+const previewButtons = document.querySelectorAll('[data-pdf]');
+
+function openPdfModal(src) {
+  if (!pdfModal || !pdfFrame) return;
+  pdfFrame.src = src;
+  if (pdfOpenTab) pdfOpenTab.href = src;
+  if (pdfDownload) pdfDownload.href = src;
+  pdfModal.classList.add('active');
+  pdfModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePdfModal() {
+  if (!pdfModal) return;
+  pdfModal.classList.remove('active');
+  pdfModal.setAttribute('aria-hidden', 'true');
+  if (pdfFrame) pdfFrame.src = '';
+  document.body.style.overflow = '';
+}
+
+previewButtons.forEach((btn) => {
+  btn.addEventListener('click', () => openPdfModal(btn.dataset.pdf));
+});
+
+if (pdfClose) pdfClose.addEventListener('click', closePdfModal);
+
+if (pdfModal) {
+  pdfModal.addEventListener('click', (e) => {
+    if (e.target === pdfModal) closePdfModal();
+  });
+}
+
+/* =========================================================================
+   9. TEMA CLARO / OSCURO
+   ========================================================================= */
+const themeToggle = document.querySelector('#themeToggle');
+const themeIcon = themeToggle?.querySelector('.theme-icon');
+const STORAGE_KEY = 'portfolio-theme';
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+  if (themeToggle) {
+    themeToggle.setAttribute(
+      'aria-label',
+      theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'
+    );
+  }
+  try {
+    localStorage.setItem(STORAGE_KEY, theme);
+  } catch (_) {
+    /* localStorage puede fallar en modo privado, ignorar */
+  }
+}
+
+let savedTheme = null;
+try {
+  savedTheme = localStorage.getItem(STORAGE_KEY);
+} catch (_) {
+  savedTheme = null;
+}
+
+const systemPrefersLight = window.matchMedia(
+  '(prefers-color-scheme: light)'
+).matches;
+const initialTheme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+applyTheme(initialTheme);
+
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const currentTheme =
+      document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  });
+}
+
+/* =========================================================================
+   10. ATAJOS GLOBALES DE TECLADO
+   ========================================================================= */
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeCertificate();
+  if (event.key === 'Escape') {
+    closeCertificate();
+    closePdfModal();
+  }
 });
