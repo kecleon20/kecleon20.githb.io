@@ -1,0 +1,152 @@
+/* =========================================================================
+   404 — PÁGINA DE ERROR
+   ========================================================================= */
+.error-page {
+  overflow: hidden;
+}
+
+.error-stage {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  justify-items: center;
+  padding: 0 6vw;
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at 20% 15%, rgba(115, 221, 255, 0.25), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(44, 125, 255, 0.22), transparent 30%),
+    linear-gradient(135deg, #06111d, #02070d 60%, #081827);
+}
+
+html[data-theme="light"] .error-stage {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(10, 167, 214, 0.18), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(31, 95, 209, 0.15), transparent 30%),
+    linear-gradient(135deg, #f3f8ff, #e3eefa 60%, #dbe8f5);
+}
+
+/* Reutilizamos .ambient, .ambient-a, .ambient-b y .grain de styles.css */
+
+/* =========================================================================
+   CARD CENTRAL
+   ========================================================================= */
+.error-card {
+  position: relative;
+  z-index: 2;
+  width: min(760px, 92vw);
+  margin: 120px 0 60px;
+  padding: 62px 54px;
+  text-align: center;
+
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.06)
+  );
+  backdrop-filter: blur(26px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+html[data-theme="light"] .error-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.6)
+  );
+  border-color: rgba(10, 28, 46, 0.1);
+}
+
+.error-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.22),
+    transparent 40%,
+    rgba(115, 221, 255, 0.14)
+  );
+  pointer-events: none;
+}
+
+.error-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================================================
+   NÚMERO GIGANTE
+   ========================================================================= */
+.error-code {
+  margin: 0 0 8px;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(110px, 22vw, 220px);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  color: var(--text-main);
+  text-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.error-code span {
+  color: var(--cyan);
+  font-style: italic;
+}
+
+.error-card h2 {
+  margin: 0 0 18px;
+  font-size: clamp(26px, 3.4vw, 40px);
+  letter-spacing: -0.04em;
+  color: var(--text-main);
+}
+
+.error-card p {
+  max-width: 520px;
+  margin: 0 auto;
+  color: var(--text-muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* =========================================================================
+   FOOTER
+   ========================================================================= */
+.error-footer {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 34px;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 600px) {
+  .error-card {
+    padding: 42px 24px;
+    margin: 110px 0 40px;
+  }
+
+  .error-card p {
+    font-size: 15px;
+  }
+
+  .error-card .actions {
+    flex-direction: column;
+  }
+
+  .error-card .actions a {
+    width: 100%;
+    text-align: center;
+  }
+}

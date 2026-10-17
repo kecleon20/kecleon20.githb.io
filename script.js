@@ -261,8 +261,11 @@ function setLightboxZoom(value) {
   zoomReset.textContent = `${Math.round(currentZoom * 100)}%`;
 }
 
+const lightboxSpinner = document.querySelector('#lightboxSpinner');
+
 function openCertificate(src, alt) {
   if (!lightbox || !lightboxImage || !openFullImage) return;
+  if (lightboxSpinner) lightboxSpinner.classList.remove('hidden');
   lightboxImage.src = src;
   lightboxImage.alt = alt || 'Certificado ampliado';
   openFullImage.href = src;
@@ -271,6 +274,17 @@ function openCertificate(src, alt) {
   document.body.style.overflow = 'hidden';
   setLightboxZoom(1);
 }
+
+// Ocultar spinner cuando la imagen del certificado termina de cargar (o falla)
+if (lightboxImage) {
+  lightboxImage.addEventListener('load', () => {
+    if (lightboxSpinner) lightboxSpinner.classList.add('hidden');
+  });
+  lightboxImage.addEventListener('error', () => {
+    if (lightboxSpinner) lightboxSpinner.classList.add('hidden');
+  });
+}
+
 
 function closeCertificate() {
   if (!lightbox) return;
@@ -318,8 +332,11 @@ const pdfOpenTab = document.querySelector('#pdfOpenTab');
 const pdfDownload = document.querySelector('#pdfDownload');
 const previewButtons = document.querySelectorAll('[data-pdf]');
 
+const pdfSpinner = document.querySelector('#pdfSpinner');
+
 function openPdfModal(src) {
   if (!pdfModal || !pdfFrame) return;
+  if (pdfSpinner) pdfSpinner.classList.remove('hidden');
   pdfFrame.src = src;
   if (pdfOpenTab) pdfOpenTab.href = src;
   if (pdfDownload) pdfDownload.href = src;
@@ -327,6 +344,14 @@ function openPdfModal(src) {
   pdfModal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
+
+// Ocultar spinner cuando el iframe del PDF termina de cargar
+if (pdfFrame) {
+  pdfFrame.addEventListener('load', () => {
+    if (pdfSpinner) pdfSpinner.classList.add('hidden');
+  });
+}
+
 
 function closePdfModal() {
   if (!pdfModal) return;

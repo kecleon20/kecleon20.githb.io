@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>404 · Página no encontrada | Thiago Chevallet</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="404.css" />
+</head>
+<body class="error-page">
+  <main class="error-stage" aria-label="Página no encontrada">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="grain"></div>
+
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Inicio">
+        <span class="brand-mark">TC</span>
+        <span class="brand-copy">
+          <strong>Thiago</strong>
+          <small>Data Analyst Jr</small>
+        </span>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+      </nav>
+      <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </header>
+
+    <section class="error-card" role="alert">
+      <span class="eyebrow">Error 404</span>
+      <h1 class="error-code">4<span>0</span>4</h1>
+      <h2>Esta página no existe.</h2>
+      <p>
+        Puede que el enlace esté roto, que la página se haya movido o que
+        hayas escrito mal la dirección. Volvamos a un lugar seguro.
+      </p>
+
+      <div class="actions center">
+        <a href="index.html">← Volver al inicio</a>
+        <a href="index.html#certificaciones" class="ghost">Ver certificados</a>
+        <a href="mailto:chevallierthiago@gmail.com" class="ghost">Contactarme</a>
+      </div>
+    </section>
+
+    <p class="error-footer">
+      Thiago Chevallet · Data Analyst Jr · <span id="year"></span>
+    </p>
+  </main>
+
+  <script>
+    // Tema claro/oscuro (misma lógica que el portfolio)
+    (function () {
+      const STORAGE_KEY = 'portfolio-theme';
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = themeToggle?.querySelector('.theme-icon');
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+        if (themeToggle) {
+          themeToggle.setAttribute(
+            'aria-label',
+            theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'
+          );
+        }
+        try { localStorage.setItem(STORAGE_KEY, theme); } catch (_) {}
+      }
+
+      let saved = null;
+      try { saved = localStorage.getItem(STORAGE_KEY); } catch (_) {}
+      const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      applyTheme(saved || (prefersLight ? 'light' : 'dark'));
+
+      themeToggle?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+
+      // Año dinámico en el footer
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

@@ -3002,3 +3002,43 @@ html[data-theme="light"] .lightbox-canvas img {
     font-size: 15px;
   }
 }}
+/* =========================================================================
+   LOADING STATES (spinners)
+   ========================================================================= */
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.loading-spinner.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+html[data-theme="light"] .loading-spinner {
+  border-color: rgba(10, 28, 46, 0.15);
+  border-top-color: var(--blue);
+}
+
+.lightbox-canvas {
+  position: relative;
+}
+
+.pdf-modal-body {
+  position: relative;
+}
